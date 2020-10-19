@@ -17,9 +17,10 @@
 #'
 
 bootdata=function(data){ #the data have to be newid, vdata in format(1990/9/14), priorstate,currenstate and covariates
-  person=length(unique(data$newid))
-  bdata=rep(0,ncol(data))
-  npri=length(unique(data$priorstate))
+
+  person=length(unique(data$newid))  #get the person number
+  bdata=rep(0,ncol(data))     #used to store the bootstrap data
+  npri=length(unique(data$priorstate))      # get the number of pristates
   propt=list()  #get the probability for sampling
   for(j in 1:npri){
     pdata=data[data$priorstate==j,]
@@ -28,10 +29,10 @@ bootdata=function(data){ #the data have to be newid, vdata in format(1990/9/14),
   }
 
   yearmax=max(apply(matrix(data$vdate,ncol = 1),1,function(x)as.numeric(substring(x,1,4))))  #get the maximum year it can reach
-  abstate=setdiff(unique(data$currentstate),unique(data$priorstate))
+  abstate=setdiff(unique(data$currentstate),unique(data$priorstate))  #get the absorbing states
 
   for(i in 1:person){
-    idata=data[data$newid==i,]
+    idata=data[data$newid==i,]                #get the data for the ith person
     ivdate=as.numeric(substring(idata[1,2],1,4)) #get the first visit year
     istate=idata[1,3] #get the initial state
     icov=unlist(idata[1,-(1:4)])  #get the covariates for ith patient
@@ -52,5 +53,6 @@ bootdata=function(data){ #the data have to be newid, vdata in format(1990/9/14),
     bdata=rbind(bdata,rowdata[-1,])
   }
   bdata=bdata[-1,]
-  return(bdata)
+  colnames(bdata)=colnames(data)
+  return(bdata)    #return a matrix with column names: person id, visit year, priorstate, currentstate, and covariate
 }
