@@ -39,23 +39,41 @@ sdfun=function(dat,M,rank,rrfactor=c(3,4,6:11),ffactor=c(12,5),priorstate=1,curr
   nt=nt-np
   if (intercept==0){
     colinB=(length(rrfactor)+length(ffactor))*nt
-  } else {colinB=(length(rrfactor)+length(ffactor)+1)*nt}
+  } else {colinB=(length(rrfactor)+length(ffactor)+1)*nt}  #colinB is the total length of coefficient matrix, stock to a vector
   VB=matrix(NA,M,colinB)
   time=rep(0,M)
   Mi=0
   i=1
+  if (is.numeric(rrfactor)){
+    rrfactor=rrfactor
+  } else {
+    rrfactor=match(rrfactor,colnames(dat))
+  }
+  if (is.numeric(ffactor)){
+    ffactor=ffactor
+  } else {
+    ffactor=match(ffactor,colnames(dat))
+  }
+  if (is.numeric(priorstate)){
+    priorstate=priorstate
+  } else {
+    priorstate=match(priorstate,colnames(dat))
+  }
+  if (is.numeric(currentstate)){
+    currentstate=currentstate
+  } else {
+    currentstate=match(currentstate,colnames(dat))
+  }
+
   while (Mi < M) {
     print(Mi)
-    Bdata=bootdata(dat)
-    sdata=Bdata[,-(1:2)]
-    R=rank
-    eps=1e-5
-    cons=rep(1,nrow(sdata))
-    sdata=cbind(sdata,cons)
+    datb=data.frame(newid=dat$newid,vdate=dat$vdate,priorstate=dat[,priorstate],currentstate=dat[,currentstate],covariates=dat[,c(rrfactor,ffactor)])
+    Bdata=bootdata(datb)
+    sdata=cbind(seq(1,nrow(Bdata)),Bdata)
     start_time <- Sys.time()
 
     tryCatch({
-      rrmodel=rrmultinom(sdata,rrfactor=rrfactor,ffactor=ffactor,intercept=intercept,priorstate=priorstate,currentstate=currentstate, R=R, eps = 1e-5)
+      rrmodel=rrmultinom(sdata,rrfactor=rrfactor,ffactor=ffactor,intercept=intercept,priorstate=priorstate,currentstate=currentstate, R=rank)
       niter=rrmodel$niter
     }, error=function(e){niter<<-300})  #if error occurs, let niter=300
 
@@ -75,9 +93,9 @@ sdfun=function(dat,M,rank,rrfactor=c(3,4,6:11),ffactor=c(12,5),priorstate=1,curr
   sdVB=1/(M-1)*t(VB-cVB)%*%(VB-cVB)
   fsdVB=matrix(diag(sdVB),sddim1,sddim2)
 
-  rrmodelori=rrmultinom(dat[-(1:2)],rrfactor=rrfactor,ffactor=ffactor,intercept=intercept,priorstate=priorstate,currentstate=currentstate, R=R, eps = 1e-5)
+  rrmodelori=rrmultinom(dat,rrfactor=rrfactor,ffactor=ffactor,intercept=intercept,priorstate=priorstate,currentstate=currentstate, R=rank)
   coef=rrmodelori$coemat
   zwpart=coef/fsdVB
-  pwpart = (1 - pnorm(abs(zwpart), 0, 1)) * 2
-  return(list(sd=fsdVB,pvalue=pwpart))
+  pwpart = (1 - pnorm(abs(zwpart), 0, 1))*2
+  return(list(coe=coef,sd=fsdVB,pvalue=pwpart))
 }
