@@ -3,20 +3,27 @@
 #' This function is used get the standard error matrix from bootstrap method
 #' It returns the matrices of standard error and p-value for the coefficient matrix
 #'
-#' @param dat the dataset
-#' @param M the bootstrap number
-#' @param rank the rank of the reduced rank model
-#' @param rrfactor the index for variables in reduced rank part, it can be a numeric vector or a vector with the variable name
-#' @param ffactor the index for variables in fixed part, it can be a numeric vector or a vector with the variable name
-#' @param priorstate the column index number for the priorstate, it is a numeric number
-#' @param currentstate the column index number for the priorstate, it is a numeric number
-#' @param intercept this parameter indicates whether the intercept is included in the model, it has options 0 or 1 with default as 0
+#' @param I a U by U incidence matrix with elements; U is the number of states; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise
+#' @param z1 a n by p matrix with covariates involved in the dimension reduction(DR), n is the number of subjects, p is the number of covariates involved in DR
+#' @param z2 a n by q matrix with study covariates (not in dimension reduction), q is the number of study covariates
+#' @param T a M by 3 state matrix,
 #' \itemize{
-#' \item 0 means to exclude the intercept in the model
-#' \item 1 means to include the intercept in the model
+#' \item the first column is a subject number between 1,..,n;
+#' \item the second column is time;
+#' \item the third column is the state occupied by subject in column 1 at time indicated in column 2
+#' }
+#' @param R the rank
+#' @param eps the tolerance for convergence; the default is 10^-5
+#' @param B the bootstrap number
+#' @param tpoint a matrix has two columns with the participants' visit information about timeline
+#'
+#' @return a list of outputs:
+#' \itemize{
+#' \item coe: the coefficient matrix of the original data
+#' \item sd: the standard error matrix
+#' \item pvalue: the p-value matrix
 #' }
 #'
-#' @return a list contains resultand matrices with \strong{sd} as the standard error matrix and \strong{pvalue} as the p-value matrix
 #'
 #' @export
 #'
@@ -29,73 +36,109 @@
 #'
 #'
 
-sdfun=function(dat,M,rank,rrfactor=c(3,4,6:11),ffactor=c(12,5),priorstate=1,currentstate=2,intercept=0){
-  np=length(unique(dat$priorstate)) #priorstate number
-  nt=0  #transition number
-  for(ip in 1:np){
-    subdat=dat[dat$priorstate==ip,]
-    nt=nt+length(unique(subdat$currentstate))
-  }
-  nt=nt-np
-  if (intercept==0){
-    colinB=(length(rrfactor)+length(ffactor))*nt
-  } else {colinB=(length(rrfactor)+length(ffactor)+1)*nt}  #colinB is the total length of coefficient matrix, stock to a vector
-  VB=matrix(NA,M,colinB)
-  time=rep(0,M)
-  Mi=0
-  i=1
-  if (is.numeric(rrfactor)){
-    rrfactor=rrfactor
-  } else {
-    rrfactor=match(rrfactor,colnames(dat))
-  }
-  if (is.numeric(ffactor)){
-    ffactor=ffactor
-  } else {
-    ffactor=match(ffactor,colnames(dat))
-  }
-  if (is.numeric(priorstate)){
-    priorstate=priorstate
-  } else {
-    priorstate=match(priorstate,colnames(dat))
-  }
-  if (is.numeric(currentstate)){
-    currentstate=currentstate
-  } else {
-    currentstate=match(currentstate,colnames(dat))
-  }
+sdfun=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,B,tpoint=NULL){  #tpoint is a M-n by 2 matrix with the patient id and visit time points(length 4) as the 1st and 2nd columns
 
-  while (Mi < M) {
-    print(Mi)
-    datb=data.frame(newid=dat$newid,vdate=dat$vdate,priorstate=dat[,priorstate],currentstate=dat[,currentstate],covariates=dat[,c(rrfactor,ffactor)])
-    Bdata=bootdata(datb)
-    sdata=cbind(seq(1,nrow(Bdata)),Bdata)
-    start_time <- Sys.time()
+  if(is.null(z1) & is.null(z2)) stop("please input the covariates")
+  if(is.null(z1)){p=0}else{n=nrow(z1); p=ncol(z1)}
+  if(is.null(z2)){q=0}else{n=nrow(z2); q=ncol(z2)}
+
+  U=nrow(I)
+  tn=sum(apply(I, 1, sum)!=0)     #number of transient states
+  wt=which(apply(I, 1, sum)!=0)   #index of transient states
+  an=nrow(I)-tn                   #number of absorbing states
+  K=sum(I)-tn                     #columns of the coefficient matrix
+  bootcoe=matrix(0,B,(p+q)*K)
+  Bi=1
+
+  while(Bi<=B){
+    if((is.null(tpoint)) | (nrow(tpoint)!=(nrow(T)-n))){     #bootstrap patients
+
+    ind=sample((1:n),n,replace = TRUE)
+    znew=matrix(0,n,p+q)
+    Tnew=matrix(0,0,3)
+    for (j in 1:n) {
+      nj=ind[j]
+      znew[j,]=c(z1[nj,],z2[nj,])
+      Tsub=T[which(T[,1]==nj),]
+      Tsub[,1]=rep(j, nrow(Tsub))
+      Tnew=rbind(Tnew,Tsub)
+    }
+    if(p==0){z1new=NULL}else{z1new=znew[,(1:p)]}
+    if(q==0){z2new=NULL}else{z2new=znew[,((p+1):(p+q))]}
+    } else {                                            #simulate MC for each patient
+      tstate=matrix(0,nrow(T)-n,2)                            #a MX2 matrix with total prior and current states
+      Mc=0
+      for(ni in 1:n){
+        subT=T[which(T[,1]==ni),,drop=FALSE]
+        mc=nrow(subT)-1
+        tstate[(Mc+1):(Mc+mc),1]=subT[,3][-(mc+1)]
+        tstate[(Mc+1):(Mc+mc),2]=subT[,3][-1]
+        Mc=Mc+mc
+      }
+      pstate=sort(unique(tstate[,1]))
+      pl=length(pstate)
+      cstate=sort(unique(tstate[,2]))
+      cl=length(cstate)
+      Pmatrix=matrix(0,pl,cl)
+      colnames(Pmatrix) = cstate
+      rownames(Pmatrix) = pstate
+      propt=list()
+      for(i in 1:pl){             #to get the frequency table
+          subtstate=tstate[which(tstate[,1]==i),,drop=FALSE]
+          curstate=sort(unique(subtstate))
+        	colind=match(curstate,cstate)
+        	Pmatrix[i,colind]=table(subtstate[,2])/sum(table(subtstate[,2]))
+        	propt[[i]]=table(subtstate[,2])/sum(table(subtstate[,2]))
+      }
+      yearmax=max(tpoint[,2])                                                  #get the max timepoint
+      abstate=setdiff(unique(tstate[,2]),unique(tstate[,1]))                   #get the absorbing states
+
+       Tnew=rep(0,3)
+       for(pi in 1:n){
+        vsind=which(tpoint[,1]==pi)                #rows index for pi-th subject
+        ivdate=tpoint[vsind,2,drop=FALSE][1,] #get the first visit year
+        istate=tstate[vsind,1,drop=FALSE][1,] #get the initial state
+        sig=1
+        pstate=c()          #store the generated prior state
+        cstate=c()          #store the generated current state
+        iyear=ivdate
+        pstate=istate
+        ntran=0               #store the transition counts for T[,2]
+        Tdata=c(pi,0,istate)      #store the generated T for ith patient
+        while(sig==1){
+          cstate=sample(as.numeric(names(propt[[pstate]])),1,prob=propt[[pstate]])   #generate the current state,
+          iyear=iyear+1
+          pstate=cstate
+          ntran=ntran+1
+          irow=c(pi,ntran,pstate)
+          Tdata=rbind(Tdata,irow)
+          if(iyear==(yearmax) | cstate %in% abstate) sig=0   #the iyear and absorbing state may need be modified for other data
+        }
+        Tnew=rbind(Tnew,Tdata)
+       }
+      Tnew=Tnew[-1,]
+      z1new=z1;z2new=z2
+    }
 
     tryCatch({
-      rrmodel=rrmultinom(sdata,rrfactor=rrfactor,ffactor=ffactor,intercept=intercept,priorstate=priorstate,currentstate=currentstate, R=rank)
-      niter=rrmodel$niter
-    }, error=function(e){niter<<-300})  #if error occurs, let niter=300
+    rrmodel=rrmultinom(I,z1=z1new,z2=z2new,T=Tnew,R)
+    niter=rrmodel$niter
+    }, error=function(e){niter<<-300})
 
-    end_time <- Sys.time()
     if(niter < 200){ # only record the results when niter < 200
-      VB[i,]=as.vector(rrmodel$coemat)
-      itime=end_time - start_time
-      time[i]=itime
-      i=i+1
-      Mi=Mi+1
+      bootcoe[Bi,]=as.vector(rrmodel$coemat)
+      Bi=Bi+1
     }
   }
-  sddim1=nrow(rrmodel$coemat)
-  sddim2=ncol(rrmodel$coemat)
-  cVB=apply(VB,2,mean)
-  cVB=t(replicate(M, cVB))
-  sdVB=1/(M-1)*t(VB-cVB)%*%(VB-cVB)
-  fsdVB=matrix(diag(sdVB),sddim1,sddim2)
 
-  rrmodelori=rrmultinom(dat,rrfactor=rrfactor,ffactor=ffactor,intercept=intercept,priorstate=priorstate,currentstate=currentstate, R=rank)
-  coef=rrmodelori$coemat
-  zwpart=coef/fsdVB
+  oricoe=rrmultinom(I,z1,z2,T,R)$coemat
+  cVB=apply(bootcoe,2,mean)
+  cVB=t(replicate(B, cVB))
+  sdVB=1/(B-1)*t(bootcoe-cVB)%*%(bootcoe-cVB)
+  fsdVB=sqrt(matrix(diag(sdVB),p+q,K))
+
+  zwpart=oricoe/fsdVB
   pwpart = (1 - pnorm(abs(zwpart), 0, 1))*2
-  return(list(coe=coef,sd=fsdVB,pvalue=pwpart))
+  return(list(coe=oricoe,sd=fsdVB,pvalue=pwpart))
 }
+

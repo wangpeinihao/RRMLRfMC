@@ -4,40 +4,37 @@
 \alias{sdfun}
 \title{sdfun}
 \usage{
-sdfun(
-  dat,
-  M,
-  rank,
-  rrfactor = c(3, 4, 6:11),
-  ffactor = c(12, 5),
-  priorstate = 1,
-  currentstate = 2,
-  intercept = 0
-)
+sdfun(I, z1 = NULL, z2 = NULL, T, R, eps = 1e-05, B, tpoint = NULL)
 }
 \arguments{
-\item{dat}{the dataset}
+\item{I}{a U by U incidence matrix with elements; U is the number of states; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise}
 
-\item{M}{the bootstrap number}
+\item{z1}{a n by p matrix with covariates involved in the dimension reduction(DR), n is the number of subjects, p is the number of covariates involved in DR}
 
-\item{rank}{the rank of the reduced rank model}
+\item{z2}{a n by q matrix with study covariates (not in dimension reduction), q is the number of study covariates}
 
-\item{rrfactor}{the index for variables in reduced rank part, it can be a numeric vector or a vector with the variable name}
-
-\item{ffactor}{the index for variables in fixed part, it can be a numeric vector or a vector with the variable name}
-
-\item{priorstate}{the column index number for the priorstate, it is a numeric number}
-
-\item{currentstate}{the column index number for the priorstate, it is a numeric number}
-
-\item{intercept}{this parameter indicates whether the intercept is included in the model, it has options 0 or 1 with default as 0
+\item{T}{a M by 3 state matrix,
 \itemize{
-\item 0 means to exclude the intercept in the model
-\item 1 means to include the intercept in the model
+\item the first column is a subject number between 1,..,n;
+\item the second column is time;
+\item the third column is the state occupied by subject in column 1 at time indicated in column 2
 }}
+
+\item{R}{the rank}
+
+\item{eps}{the tolerance for convergence; the default is 10^-5}
+
+\item{B}{the bootstrap number}
+
+\item{tpoint}{a matrix has two columns with the participants' visit information about timeline}
 }
 \value{
-a list contains resultand matrices with \strong{sd} as the standard error matrix and \strong{pvalue} as the p-value matrix
+a list of outputs:
+\itemize{
+\item coe: the coefficient matrix of the original data
+\item sd: the standard error matrix
+\item pvalue: the p-value matrix
+}
 }
 \description{
 This function is used get the standard error matrix from bootstrap method

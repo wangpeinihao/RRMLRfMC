@@ -2,13 +2,15 @@
 #'
 #' This function is used to update A matrix
 #'
-#' @param Dfix the coefficient matrix for fixed variables
+#' @param Dfix the coefficient matrix for study covariates
 #' @param Gamma the G matrix value
 #' @param Adata the dataset
-#' @param iniA the initial A matrix; if missing, a constant matrix with elements 0.01
 #' @param R the rank of reduced rank model
-#' @param ptrans a vector with transition number for each state
-#' @param  eps the tolerance for convergence, default is 10^-5
+#' @param p the number of covariates in the dimension reduction
+#' @param q the numbne of study covariates
+#' @param I a U by U incidence matrix with elements; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise
+#' @param iniA initial value for the iteration
+#' @param eps the tolerance for convergence, default is 10^-5
 #'
 #' @return a list of outputs:
 #' \itemize{
@@ -25,28 +27,18 @@
 #'
 #'
 
-Aupdate=function(Dfix,Gamma,Adata,iniA,R,ptrans,eps){  #Adata=pri,curr,pred,fpred,obstrans
-  pred=as.matrix(Adata$pred)
-  p=ncol(pred)
-  #y=apply(matrix(curr,n,1), 1, expand)
-  #zyo=cbind(t(y),pred,fpred, pri)
-  zyo=cbind(Adata$pri,Adata$curr,Adata$pred,Adata$fpred,Adata$obstrans)
+Aupdate=function(Dfix,Gamma, Adata,R,p,q,I,iniA, eps){
 
+   zyo=Adata
 
   if(missing(iniA)) iniA <- matrix(rep(0.01,p*R),p,R)#iniA <- matrix(rnorm(p*R),p,R) #give an initial value to A iniA <- matrix(runif(p*R,-0.7,0.7),p,R)
-  loglikeold=100
-  iteAu=0
-  deltaAu=10
-  Avc.old=iniA
-  #while(deltaAu > eps & iteAu <=200){
+  loglikeold=100; iteAu=0; deltaAu=10; Avc.old=iniA
   while(deltaAu > eps & iteAu <=100){
     iteAu=iteAu+1
-    #Dmat=matrix(Dfix,ncol=21)
     Dmat=Dfix
-    #Gamma=matrix(Gamma,ncol = 21)
     Gamma=as.matrix(Gamma)
 
-    newton=apply(as.matrix(zyo),1, function(x) derivatives(A=Avc.old,Gamma=Gamma,Dmat=Dmat,ptrans=ptrans,x))
+    newton=apply(as.matrix(zyo),1, function(x) derivatives(A=Avc.old,Gamma,Dmat,I,x))
     newton=apply(newton, 1,sum)
 
     if(sum(is.na(newton))>0){

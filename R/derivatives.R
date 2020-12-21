@@ -5,7 +5,7 @@
 #' @param A matrix with value from previous iteration
 #' @param Gamma G matrix values
 #' @param Dmat the coefficient matrix for the fixed variables,
-#' @param ptrans a vector with transition number for each state
+#' @param I a U by U incidence matrix with elements; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise
 #' @param zy the variable values for a given observation
 #'
 #' @return a list of outputs:
@@ -24,14 +24,17 @@
 #'
 #'
 
-derivatives <- function(A,Gamma,Dmat,ptrans,zy){   ##zy=rows of Adata=pri,curr,pred,fpred,obstrans     derivative
+derivatives <- function(A,Gamma,Dmat,I,zy){   ##zy=rows of Adata=pri,curr,pred,fpred,obstrans     derivative
+  rsum=apply(I, 1,sum)
+  ptrans=rsum[rsum!=0]
   p=nrow(A)
   q=nrow(Dmat)
   zy=unlist(zy)
   pri=zy[1]
   curr=zy[2]
-  pstr=zy[length(zy)]                  #get the number of transitions for this obs
-  y=matrix(expand(curr,pstr-1),ncol = 1)
+  td=apply(I, 1, sum)               #get the transition number for each prior state
+  pstr=td[pri]                 #get the number of transitions for this obs
+  y=matrix(expand(pri,curr,I),ncol = 1)
   Kd=sum(ptrans-1)
   Gamma=matrix(Gamma,ncol = Kd)
   Dmat=matrix(Dmat,ncol = Kd)

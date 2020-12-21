@@ -4,38 +4,23 @@
 \alias{rrmultinom}
 \title{rrmultinom}
 \usage{
-rrmultinom(
-  data,
-  rrfactor,
-  ffactor = NULL,
-  intercept = 0,
-  priorstate,
-  currentstate,
-  R,
-  Gamma.start,
-  eps = 1e-05
-)
+rrmultinom(I, z1 = NULL, z2 = NULL, T, R, eps = 1e-05)
 }
 \arguments{
-\item{data}{the dataset}
+\item{I}{a U by U incidence matrix with elements; U is the number of states; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise}
 
-\item{rrfactor}{the index for variables involved in reduced rank, it could be a numeric vector or a vector with variable name}
+\item{z1}{a n by p matrix with covariates involved in the dimension reduction(DR), n is the number of subjects, p is the number of covariates involved in DR}
 
-\item{ffactor}{the index for fixed variables, it could be a numeric vector or a vector with variable name}
+\item{z2}{a n by q matrix with study covariates (not in dimension reduction), q is the number of study covariates}
 
-\item{intercept}{used to indicate whether intercept should be considered, 0 means no intercept and 1 means with intercept
+\item{T}{a M by 3 state matrix,
 \itemize{
-\item 0 means to exclude the intercept in the model
-\item 1 means to include the intercept in the model
+\item the first column is a subject number between 1,..,n;
+\item the second column is time;
+\item the third column is the state occupied by subject in column 1 at time indicated in column 2
 }}
 
-\item{priorstate}{the column index for priorstate}
-
-\item{currentstate}{the column index for currentstate}
-
 \item{R}{the rank}
-
-\item{Gamma.start}{the initial value for G}
 
 \item{eps}{the tolerance for convergence; the default is 10^-5}
 }
@@ -52,6 +37,7 @@ a list of outputs:
 \item niter: the iteration number to get converged
 \item df: the degrees of freedom
 \item loglik: the final loglikelihood
+\item converge: three possible values with 0 means fail to converge, 1 means converges, and 2 means the maximum iteration is achieved
 }
 }
 \description{

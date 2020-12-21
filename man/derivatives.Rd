@@ -4,7 +4,7 @@
 \alias{derivatives}
 \title{derivatives}
 \usage{
-derivatives(A, Gamma, Dmat, ptrans, zy)
+derivatives(A, Gamma, Dmat, I, zy)
 }
 \arguments{
 \item{A}{matrix with value from previous iteration}
@@ -13,7 +13,7 @@ derivatives(A, Gamma, Dmat, ptrans, zy)
 
 \item{Dmat}{the coefficient matrix for the fixed variables,}
 
-\item{ptrans}{a vector with transition number for each state}
+\item{I}{a U by U incidence matrix with elements; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise}
 
 \item{zy}{the variable values for a given observation}
 }

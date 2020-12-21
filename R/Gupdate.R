@@ -4,7 +4,9 @@
 #'
 #' @param A numeric matrix
 #' @param Gdata the dataset used to update G
-#' @param ptrans a vector with transition number for each state
+#' @param p the number of covariates in the dimension reduction
+#' @param q the numbne of study covariates
+#' @param I a U by U incidence matrix with elements; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise
 #'
 #' @return a list of outputs:
 #' \itemize{
@@ -22,35 +24,38 @@
 #'
 #'
 
-Gupdate=function(A,Gdata,ptrans){   #Gdata=pri,curr,pred,fpred,obstrans
-  pri=Gdata$pri
+Gupdate=function(A,Gdata,p,q,I){   #Gdata=pri,curr,pred,fpred,obstrans
+  pri=Gdata[,1]
   si=length(unique(pri))
   A=as.matrix(A)
-  pred=as.matrix(unlist(Gdata$pred))
+  pred=Gdata[,(3:(2+p)),drop=FALSE]
   T=ncol(A)
-  if(is.null(Gdata$fpred)){
+  wt=which(apply(I, 1, sum)!=0)
+
+  if(q==0){
     fpred=NULL
   }else{
-    fpred=as.matrix(unlist(Gdata$fpred))
+    fpred=Gdata[,((3+p):(2+p+q)),drop=FALSE]
   }
-  q=ncol(fpred)
-  if(is.null(q))q=0
-  curr=Gdata$curr
-  K=sum(ptrans-1)
+  curr=Gdata[,2]
+  K=sum(I)-sum(apply(I, 1, sum)!=0)
   G=matrix(0,T+q,K)
   sderr=matrix(0,T+q,K) #store the standard error
   loglikeK=rep(0,si)
-  colind=c(0,cumsum(ptrans-1))
+  cp=0
   for (i in 1:si){
+    ti=wt[i]
+    cm=sum(I[ti,])-1
     resp=as.factor(curr[pri==i])
     predi=cbind(fpred[pri==i,],(pred[pri==i,,drop=FALSE])%*%A)
     rlevi=min(curr[pri==i])
     resp2=relevel(resp,ref=rlevi)
     data=as.data.frame(cbind(resp2,predi))
     fit=multinom(resp2 ~ 0+predi, data = data)
-    G[,(colind[i]+1):(colind[i+1])] = t(summary(fit)$coefficients)
-    sderr[,(colind[i]+1):(colind[i+1])]=t(summary(fit)$standard.errors)
+    G[,(cp+1):(cp+cm)] = t(summary(fit)$coefficients)
+    sderr[,(cp+1):(cp+cm)]=t(summary(fit)$standard.errors)
     loglikeK[i]=-fit$value
+    cp=cp+cm
   }
 
   loglikeKt=sum(loglikeK)

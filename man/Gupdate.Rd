@@ -4,14 +4,18 @@
 \alias{Gupdate}
 \title{Gupdate}
 \usage{
-Gupdate(A, Gdata, ptrans)
+Gupdate(A, Gdata, p, q, I)
 }
 \arguments{
 \item{A}{numeric matrix}
 
 \item{Gdata}{the dataset used to update G}
 
-\item{ptrans}{a vector with transition number for each state}
+\item{p}{the number of covariates in the dimension reduction}
+
+\item{q}{the numbne of study covariates}
+
+\item{I}{a U by U incidence matrix with elements; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise}
 }
 \value{
 a list of outputs:

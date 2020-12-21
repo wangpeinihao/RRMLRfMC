@@ -4,15 +4,17 @@
 \alias{expand}
 \title{expand}
 \usage{
-expand(y, ml)
+expand(pri, curr, I)
 }
 \arguments{
-\item{y}{the current state}
+\item{pri}{the prior state}
 
-\item{ml}{the length of the indicator vector}
+\item{curr}{the current state}
+
+\item{I}{a U by U incidence matrix with elements; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise}
 }
 \value{
-a indicator vector
+ry: a indicator vector
 }
 \description{
 This function is used to expand the Y(category) to a indicator vector

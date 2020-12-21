@@ -8,5 +8,5 @@ rrmultinom()
 Fit the reduced-rank multinomial logistic regression for Markov chain
 }
 \examples{
-rrmultinom(data,rrfactor,ffactor=NULL,intercept=0, priorstate,currentstate, R, Gamma.start, eps = 1e-5)
+rrmultinom(I,z1,z2,T,R)
 }

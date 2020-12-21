@@ -4,20 +4,24 @@
 \alias{Aupdate}
 \title{Aupdate}
 \usage{
-Aupdate(Dfix, Gamma, Adata, iniA, R, ptrans, eps)
+Aupdate(Dfix, Gamma, Adata, R, p, q, I, iniA, eps)
 }
 \arguments{
-\item{Dfix}{the coefficient matrix for fixed variables}
+\item{Dfix}{the coefficient matrix for study covariates}
 
 \item{Gamma}{the G matrix value}
 
 \item{Adata}{the dataset}
 
-\item{iniA}{the initial A matrix; if missing, a constant matrix with elements 0.01}
-
 \item{R}{the rank of reduced rank model}
 
-\item{ptrans}{a vector with transition number for each state}
+\item{p}{the number of covariates in the dimension reduction}
+
+\item{q}{the numbne of study covariates}
+
+\item{I}{a U by U incidence matrix with elements; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise}
+
+\item{iniA}{initial value for the iteration}
 
 \item{eps}{the tolerance for convergence, default is 10^-5}
 }

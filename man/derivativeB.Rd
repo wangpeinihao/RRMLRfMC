@@ -4,12 +4,12 @@
 \alias{derivativeB}
 \title{derivativeB}
 \usage{
-derivativeB(B, ptrans, zy)
+derivativeB(B, I, zy)
 }
 \arguments{
 \item{B}{a numeric coefficient matrix}
 
-\item{ptrans}{a vector with transition number for each state}
+\item{I}{U by U incidence matrix with elements; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise}
 
 \item{zy}{the variable values for a given observation}
 }
