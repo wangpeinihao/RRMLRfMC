@@ -7,6 +7,7 @@
 #' @param p the number of covariates in the dimension reduction
 #' @param q the numbne of study covariates
 #' @param I a U by U incidence matrix with elements; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise
+#' @param refG a vector of reference categories
 #'
 #' @return a list of outputs:
 #' \itemize{
@@ -24,7 +25,7 @@
 #'
 #'
 
-Gupdate=function(A,Gdata,p,q,I){   #Gdata=pri,curr,pred,fpred,obstrans
+Gupdate=function(A,Gdata,p,q,I,refG){   #Gdata=pri,curr,pred,fpred,obstrans
   pri=Gdata[,1]
   si=length(unique(pri))
   A=as.matrix(A)
@@ -48,9 +49,9 @@ Gupdate=function(A,Gdata,p,q,I){   #Gdata=pri,curr,pred,fpred,obstrans
     cm=sum(I[ti,])-1
     resp=as.factor(curr[pri==i])
     predi=cbind(fpred[pri==i,],(pred[pri==i,,drop=FALSE])%*%A)
-    rlevi=min(curr[pri==i])
-    resp2=relevel(resp,ref=rlevi)
-    data=as.data.frame(cbind(resp2,predi))
+    rlevi=refG[i]
+    resp2=relevel(resp,ref=as.character(rlevi))
+    data=as.data.frame(cbind(resp2, predi))
     fit=multinom(resp2 ~ 0+predi, data = data)
     G[,(cp+1):(cp+cm)] = t(summary(fit)$coefficients)
     sderr[,(cp+1):(cp+cm)]=t(summary(fit)$standard.errors)

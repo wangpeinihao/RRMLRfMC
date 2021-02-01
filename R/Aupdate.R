@@ -11,6 +11,7 @@
 #' @param I a U by U incidence matrix with elements; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise
 #' @param iniA initial value for the iteration
 #' @param eps the tolerance for convergence, default is 10^-5
+#' @param refA a vector of reference categories
 #'
 #' @return a list of outputs:
 #' \itemize{
@@ -27,7 +28,7 @@
 #'
 #'
 
-Aupdate=function(Dfix,Gamma, Adata,R,p,q,I,iniA, eps){
+Aupdate=function(Dfix,Gamma, Adata,R,p,q,I,iniA, eps,refA){
 
    zyo=Adata
 
@@ -38,7 +39,7 @@ Aupdate=function(Dfix,Gamma, Adata,R,p,q,I,iniA, eps){
     Dmat=Dfix
     Gamma=as.matrix(Gamma)
 
-    newton=apply(as.matrix(zyo),1, function(x) derivatives(A=Avc.old,Gamma,Dmat,I,x))
+    newton=apply(as.matrix(zyo),1, function(x) derivatives(A=Avc.old,Gamma,Dmat,I,x,refA))
     newton=apply(newton, 1,sum)
 
     if(sum(is.na(newton))>0){

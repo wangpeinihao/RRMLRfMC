@@ -7,6 +7,7 @@
 #' @param Dmat the coefficient matrix for the fixed variables,
 #' @param I a U by U incidence matrix with elements; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise
 #' @param zy the variable values for a given observation
+#' @param refA a vector of reference categories
 #'
 #' @return a list of outputs:
 #' \itemize{
@@ -24,7 +25,7 @@
 #'
 #'
 
-derivatives <- function(A,Gamma,Dmat,I,zy){   ##zy=rows of Adata=pri,curr,pred,fpred,obstrans     derivative
+derivatives <- function(A,Gamma,Dmat,I,zy,refA){   ##zy=rows of Adata=pri,curr,pred,fpred,obstrans     derivative
   rsum=apply(I, 1,sum)
   ptrans=rsum[rsum!=0]
   p=nrow(A)
@@ -34,7 +35,7 @@ derivatives <- function(A,Gamma,Dmat,I,zy){   ##zy=rows of Adata=pri,curr,pred,f
   curr=zy[2]
   td=apply(I, 1, sum)               #get the transition number for each prior state
   pstr=td[pri]                 #get the number of transitions for this obs
-  y=matrix(expand(pri,curr,I),ncol = 1)
+  y=matrix(expand(pri,curr,I,refE=refA),ncol = 1)
   Kd=sum(ptrans-1)
   Gamma=matrix(Gamma,ncol = Kd)
   Dmat=matrix(Dmat,ncol = Kd)

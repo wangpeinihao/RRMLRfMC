@@ -5,6 +5,7 @@
 #' @param B a numeric coefficient matrix
 #' @param I U by U incidence matrix with elements; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise
 #' @param zy the variable values for a given observation
+#' @param refd a vector of reference categories
 #'
 #' @return loglikelihood
 #'
@@ -17,7 +18,7 @@
 #'
 #'
 
-derivativeB <- function(B,I,zy){   ##pri,curr,pred,fpred,obstrans
+derivativeB <- function(B,I,zy,refd){   ##pri,curr,pred,fpred,obstrans
   p=nrow(B)
   #zy=unlist(zy)
   rsum=apply(I, 1,sum)
@@ -28,7 +29,7 @@ derivativeB <- function(B,I,zy){   ##pri,curr,pred,fpred,obstrans
   curr=zy[2]
   td=apply(I, 1, sum)
   pstr=td[pri]
-  y=expand(pri,curr,I)
+  y=expand(pri,curr,I,refE=refd)
   ptrans=rsum[rsum!=0]
   colind=c(0,cumsum(ptrans-1))
 

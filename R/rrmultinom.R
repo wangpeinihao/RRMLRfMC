@@ -13,6 +13,7 @@
 #' }
 #' @param R the rank
 #' @param eps the tolerance for convergence; the default is 10^-5
+#' @param ref a vector of reference categories; the default is NULL and if NULL is used, the function will use the first category as the reference category for each row
 #'
 #' @return a list of outputs:
 #' \itemize{
@@ -38,12 +39,14 @@
 #'
 #'
 
-rrmultinom=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5){
+rrmultinom=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,ref=NULL){
   #U=number of states; I=incidence matrix;z1=DR variables;
   #z2=study variables;T=state matrix;
 
   U=nrow(I)
   tn=sum(apply(I, 1, sum)!=0)     #number of transient states
+  if(is.null(ref)) ref=as.vector(na.omit(apply(I,1,function(x) which(x!=0)[1])))
+  if(!is.null(ref)){ if(length(ref)!=tn) stop("please have a correct length for reference vector")}
   wt=which(apply(I, 1, sum)!=0)   #index of transient states
   an=nrow(I)-tn                   #number of absorbing states
   K=sum(I)-tn                     #columns of the coefficient matrix
@@ -79,8 +82,8 @@ rrmultinom=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5){
       resp0=as.factor(mdata[mdata[,3]==ti,4])
       bcl=sum(I[ti,])-1            #number of coefficient columns for ith MLR (with )
       pred0=as.matrix(mdata[mdata[,3]==ti,(5:(4+q)),drop=FALSE])
-      rlev=min(mdata[mdata[,3]==ti,4])
-      resp01=relevel(resp0,ref=rlev)
+      rlev=ref[i]
+      resp01=relevel(resp0,ref=as.character(rlev))
       data0=as.data.frame(cbind(resp01,pred0))
       fit=multinom(resp01 ~ 0+pred0, data = data0)
       B0[,(bp+1):(bp+bcl)] = t(summary(fit)$coefficients)
@@ -124,8 +127,8 @@ rrmultinom=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5){
       resp0=as.factor(mdata[mdata[,3]==ti,4])
       bcl=sum(I[ti,])-1            #number of coefficient columns for ith MLR (with )
       pred0=as.matrix(mdata[mdata[,3]==ti,(5:(4+p)),drop=FALSE])
-      rlev=min(mdata[mdata[,3]==ti,4])
-      resp01=relevel(resp0,ref=rlev)
+      rlev=ref[i]
+      resp01=relevel(resp0,ref=as.character(rlev))
       data0=as.data.frame(cbind(resp01,pred0))
       fit=multinom(resp01 ~ 0+pred0, data = data0)
       B0[,(bp+1):(bp+bcl)] = t(summary(fit)$coefficients)
@@ -147,19 +150,19 @@ rrmultinom=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5){
     iter=0;prev.loglik=0;Delta=10;miter=200
     while(abs(Delta) > eps & iter <=miter) {
       tryCatch({
-        Anew = Aupdate(Dfix=Diter,Gamma=Gamma.iter, Adata=mdata[,-c(1,2)], R,p,q,I,iniA, eps)#iniA=iniA,pri=pri,curr=curr,pred=pred, fpred=fpred,
+        Anew = Aupdate(Dfix=Diter,Gamma=Gamma.iter, Adata=mdata[,-c(1,2)], R=R,p=p,q=q,I=I, eps=eps,refA=ref)#iniA=iniA,pri=pri,curr=curr,pred=pred, fpred=fpred,
         A.iter = Anew$NewA
         loglikeA=Anew$loglikeA
-        svdA=svd(A.iter%*%Gamma.iter,nv=K)
-        Ai <- (svdA$u %*% diag(sqrt(svdA$d)))[,1:R]
-        if (R>1){
-          norm.Ai <- apply(Ai^2,2, function(x) sqrt(sum(x)))
-        } else {norm.Ai <- sqrt(sum(Ai^2))}
-        norm.Ai.mat <- matrix(norm.Ai,p,R,byrow=TRUE)
-        A.iter <- Ai/norm.Ai.mat
+        # svdA=svd(A.iter%*%Gamma.iter,nv=K)
+        # Ai <- (svdA$u %*% diag(sqrt(svdA$d)))[,1:R]
+        # if (R>1){
+        #   norm.Ai <- apply(Ai^2,2, function(x) sqrt(sum(x)))
+        # } else {norm.Ai <- sqrt(sum(Ai^2))}
+        # norm.Ai.mat <- matrix(norm.Ai,p,R,byrow=TRUE)
+        # A.iter <- Ai/norm.Ai.mat
       }, error=function(e){convergent<<-0; iter<<-1000})
 
-      Gnew=Gupdate(A=A.iter,Gdata=mdata[,-c(1,2)],p,q,I)#pri=pri,curr=curr,pred=pred,fpred=fpred
+      Gnew=Gupdate(A=A.iter,Gdata=mdata[,-c(1,2)],p,q,I,refG=ref)#pri=pri,curr=curr,pred=pred,fpred=fpred
       if(q==0){
         Diter=matrix(0,q,K)
       }else{
@@ -175,7 +178,7 @@ rrmultinom=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5){
       # Gamma.iter <- matrix(Gamma.final,R,K)
       coemat=rbind(B.iter,Diter)
 
-      loglikeBi=apply(mdata[,-c(1,2)], 1, function(x) derivativeB(B=coemat,I,x)) ##pri,curr,pred,fpred,obstrans
+      loglikeBi=apply(mdata[,-c(1,2)], 1, function(x) derivativeB(B=coemat,I,x,refd=ref)) ##pri,curr,pred,fpred,obstrans
       loglikeB=sum(loglikeBi)
 
       Delta=prev.loglik-loglikeB
