@@ -16,6 +16,7 @@
 #' @param eps the tolerance for convergence; the default is 10^-5
 #' @param B the bootstrap number
 #' @param tpoint a matrix has two columns with the participants' visit information about timeline
+#' @param ref a vector of reference categories
 #'
 #' @return a list of outputs:
 #' \itemize{
@@ -36,7 +37,7 @@
 #'
 #'
 
-sdfun=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,B,tpoint=NULL){  #tpoint is a M-n by 2 matrix with the patient id and visit time points(length 4) as the 1st and 2nd columns
+sdfun=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,B,tpoint=NULL,ref){  #tpoint is a M-n by 2 matrix with the patient id and visit time points(length 4) as the 1st and 2nd columns
 
   if(is.null(z1) & is.null(z2)) stop("please input the covariates")
   if(is.null(z1)){p=0}else{n=nrow(z1); p=ncol(z1)}
@@ -121,7 +122,7 @@ sdfun=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,B,tpoint=NULL){  #tpoint is a M-
     }
 
     tryCatch({
-    rrmodel=rrmultinom(I,z1=z1new,z2=z2new,T=Tnew,R)
+    rrmodel=rrmultinom(I,z1=z1new,z2=z2new,T=Tnew,R,eps=1e-5,ref)
     niter=rrmodel$niter
     }, error=function(e){niter<<-300})
 
@@ -131,7 +132,7 @@ sdfun=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,B,tpoint=NULL){  #tpoint is a M-
     }
   }
 
-  oricoe=rrmultinom(I,z1,z2,T,R)$coemat
+  oricoe=rrmultinom(I,z1,z2,T,R,eps=1e-5,ref)$coemat
   cVB=apply(bootcoe,2,mean)
   cVB=t(replicate(B, cVB))
   sdVB=1/(B-1)*t(bootcoe-cVB)%*%(bootcoe-cVB)
