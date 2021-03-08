@@ -4,7 +4,7 @@
 \alias{sdfun}
 \title{sdfun}
 \usage{
-sdfun(I, z1 = NULL, z2 = NULL, T, R, eps = 1e-05, B, tpoint = NULL)
+sdfun(I, z1 = NULL, z2 = NULL, T, R, eps = 1e-05, B, tpoint = NULL, ref)
 }
 \arguments{
 \item{I}{a U by U incidence matrix with elements; U is the number of states; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise}
@@ -27,6 +27,8 @@ sdfun(I, z1 = NULL, z2 = NULL, T, R, eps = 1e-05, B, tpoint = NULL)
 \item{B}{the bootstrap number}
 
 \item{tpoint}{a matrix has two columns with the participants' visit information about timeline}
+
+\item{ref}{a vector of reference categories}
 }
 \value{
 a list of outputs:

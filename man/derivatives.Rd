@@ -4,7 +4,7 @@
 \alias{derivatives}
 \title{derivatives}
 \usage{
-derivatives(A, Gamma, Dmat, I, zy)
+derivatives(A, Gamma, Dmat, I, zy, refA)
 }
 \arguments{
 \item{A}{matrix with value from previous iteration}
@@ -16,6 +16,8 @@ derivatives(A, Gamma, Dmat, I, zy)
 \item{I}{a U by U incidence matrix with elements; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise}
 
 \item{zy}{the variable values for a given observation}
+
+\item{refA}{a vector of reference categories}
 }
 \value{
 a list of outputs:

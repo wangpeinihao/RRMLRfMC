@@ -4,7 +4,7 @@
 \alias{derivativeB}
 \title{derivativeB}
 \usage{
-derivativeB(B, I, zy)
+derivativeB(B, I, zy, refd)
 }
 \arguments{
 \item{B}{a numeric coefficient matrix}
@@ -12,6 +12,8 @@ derivativeB(B, I, zy)
 \item{I}{U by U incidence matrix with elements; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise}
 
 \item{zy}{the variable values for a given observation}
+
+\item{refd}{a vector of reference categories}
 }
 \value{
 loglikelihood

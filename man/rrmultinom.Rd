@@ -4,10 +4,10 @@
 \alias{rrmultinom}
 \title{rrmultinom}
 \usage{
-rrmultinom(I, z1 = NULL, z2 = NULL, T, R, eps = 1e-05)
+rrmultinom(I, z1 = NULL, z2 = NULL, T, R, eps = 1e-05, ref = NULL)
 }
 \arguments{
-\item{I}{a U by U incidence matrix with elements; U is the number of states; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise}
+\item{I}{a U by U incidence matrix with elements; U is number of states; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise}
 
 \item{z1}{a n by p matrix with covariates involved in the dimension reduction(DR), n is the number of subjects, p is the number of covariates involved in DR}
 
@@ -23,6 +23,8 @@ rrmultinom(I, z1 = NULL, z2 = NULL, T, R, eps = 1e-05)
 \item{R}{the rank}
 
 \item{eps}{the tolerance for convergence; the default is 10^-5}
+
+\item{ref}{a vector of reference categories; the default is NULL and if NULL is used, the function will use the first category as the reference category for each row}
 }
 \value{
 a list of outputs:

@@ -4,7 +4,7 @@
 \alias{Aupdate}
 \title{Aupdate}
 \usage{
-Aupdate(Dfix, Gamma, Adata, R, p, q, I, iniA, eps)
+Aupdate(Dfix, Gamma, Adata, R, p, q, I, iniA, eps, refA)
 }
 \arguments{
 \item{Dfix}{the coefficient matrix for study covariates}
@@ -24,6 +24,8 @@ Aupdate(Dfix, Gamma, Adata, R, p, q, I, iniA, eps)
 \item{iniA}{initial value for the iteration}
 
 \item{eps}{the tolerance for convergence, default is 10^-5}
+
+\item{refA}{a vector of reference categories}
 }
 \value{
 a list of outputs:

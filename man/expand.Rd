@@ -4,7 +4,7 @@
 \alias{expand}
 \title{expand}
 \usage{
-expand(pri, curr, I)
+expand(pri, curr, I, refE)
 }
 \arguments{
 \item{pri}{the prior state}
@@ -12,6 +12,8 @@ expand(pri, curr, I)
 \item{curr}{the current state}
 
 \item{I}{a U by U incidence matrix with elements; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise}
+
+\item{refE}{a vector with the reference categories}
 }
 \value{
 ry: a indicator vector
