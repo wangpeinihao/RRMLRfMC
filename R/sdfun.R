@@ -52,7 +52,7 @@ sdfun=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,B,tpoint=NULL,ref){  #tpoint is 
   Bi=1
 
   while(Bi<=B){
-    if((is.null(tpoint)) | (nrow(tpoint)!=(nrow(T)-n))){     #bootstrap patients
+    if((is.null(tpoint)) | isTRUE(nrow(tpoint)!=(nrow(T)-n))){     #bootstrap patients
 
     ind=sample((1:n),n,replace = TRUE)
     znew=matrix(0,n,p+q)
