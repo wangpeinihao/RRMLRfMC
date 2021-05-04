@@ -42,13 +42,3 @@ a list of outputs:
 This function is used get the standard error matrix from bootstrap method
 It returns the matrices of standard error and p-value for the coefficient matrix
 }
-\examples{
-
-
-
-
-
-}
-\references{
-
-}

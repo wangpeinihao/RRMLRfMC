@@ -21,10 +21,3 @@ ry: a indicator vector
 \description{
 This function is used to expand the Y(category) to a indicator vector
 }
-\examples{
-
-
-
-
-
-}

@@ -20,7 +20,7 @@
 #'   \item{lowed}{low education}
 #'   \item{headinj}{self reported head injury}
 #' }
-#' @source \url{}
+#'
 "cogdat"
 #'
 #'

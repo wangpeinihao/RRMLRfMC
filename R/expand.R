@@ -9,9 +9,6 @@
 #'
 #' @return ry: a indicator vector
 #'
-#' @export
-#'
-#' @examples
 #'
 #'
 #'

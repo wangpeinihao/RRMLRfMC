@@ -16,10 +16,6 @@
 #' \item sderr: standard errors for the coefficient matrix
 #' }
 #'
-#' @export
-#'
-#' @examples
-#'
 #'
 #'
 #'
@@ -50,9 +46,9 @@ Gupdate=function(A,Gdata,p,q,I,refG){   #Gdata=pri,curr,pred,fpred,obstrans
     resp=as.factor(curr[pri==i])
     predi=cbind(fpred[pri==i,],(pred[pri==i,,drop=FALSE])%*%A)
     rlevi=refG[i]
-    resp2=relevel(resp,ref=as.character(rlevi))
+    resp2=stats::relevel(resp,ref=as.character(rlevi))
     data=as.data.frame(cbind(resp2, predi))
-    fit=multinom(resp2 ~ 0+predi, data = data)
+    fit=nnet::multinom(resp2 ~ 0+predi, data = data)
     G[,(cp+1):(cp+cm)] = t(summary(fit)$coefficients)
     sderr[,(cp+1):(cp+cm)]=t(summary(fit)$standard.errors)
     loglikeK[i]=-fit$value

@@ -45,10 +45,3 @@ a list of outputs:
 \description{
 This function is used to fit the reduced rank multinomial logistic regression for markov chain
 }
-\examples{
-
-
-
-
-
-}

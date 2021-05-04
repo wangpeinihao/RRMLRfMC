@@ -21,10 +21,3 @@ loglikelihood
 \description{
 This function is used to calculate the loglikelihood with a given matrix B=AG
 }
-\examples{
-
-
-
-
-
-}

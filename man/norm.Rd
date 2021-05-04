@@ -15,10 +15,3 @@ a normalized vector with length 1
 \description{
 This function is used to normalize a vector to have unit length
 }
-\examples{
-
-
-
-
-
-}

@@ -30,10 +30,3 @@ a list of outputs:
 \description{
 This function is used to update G matrix
 }
-\examples{
-
-
-
-
-
-}

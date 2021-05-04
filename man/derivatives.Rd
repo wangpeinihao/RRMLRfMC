@@ -30,10 +30,3 @@ a list of outputs:
 \description{
 This function is used calculate the derivative values (first and second derivatives for Newton-Raphson method) and loglikelihood when updating A
 }
-\examples{
-
-
-
-
-
-}

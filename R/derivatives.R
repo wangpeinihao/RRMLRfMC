@@ -16,9 +16,6 @@
 #' \item loglike: the loglikelihood
 #' }
 #'
-#' @export
-#'
-#' @examples
 #'
 #'
 #'

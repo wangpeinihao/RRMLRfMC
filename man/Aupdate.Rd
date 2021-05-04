@@ -37,10 +37,3 @@ a list of outputs:
 \description{
 This function is used to update A matrix
 }
-\examples{
-
-
-
-
-
-}

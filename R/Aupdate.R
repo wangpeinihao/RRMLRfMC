@@ -19,9 +19,6 @@
 #' \item loglikeA: the loglikelihood when updating A
 #' }
 #'
-#' @export
-#'
-#' @examples
 #'
 #'
 #'

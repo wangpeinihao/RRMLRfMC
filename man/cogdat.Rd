@@ -22,9 +22,6 @@ A data frame with 6240 rows and 14 columns:
   \item{headinj}{self reported head injury}
 }
 }
-\source{
-\url{}
-}
 \usage{
 cogdat
 }

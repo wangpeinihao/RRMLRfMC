@@ -9,9 +9,6 @@
 #'
 #' @return loglikelihood
 #'
-#' @export
-#'
-#' @examples
 #'
 #'
 #'

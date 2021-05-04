@@ -6,9 +6,6 @@
 #'
 #' @return a normalized vector with length 1
 #'
-#' @export
-#'
-#' @examples
 #'
 #'
 #'

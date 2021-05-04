@@ -30,9 +30,6 @@
 #' \item converge: three possible values with 0 means fail to converge, 1 means converges, and 2 means the maximum iteration is achieved
 #' }
 #'
-#' @export
-#'
-#' @examples
 #'
 #'
 #'
@@ -43,9 +40,18 @@ rrmultinom=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,ref=NULL){
   #U=number of states; I=incidence matrix;z1=DR variables;
   #z2=study variables;T=state matrix;
 
+  I=as.matrix(I)
   U=nrow(I)
   tn=sum(apply(I, 1, sum)!=0)     #number of transient states
-  if(is.null(ref)) ref=as.vector(na.omit(apply(I,1,function(x) which(x!=0)[1])))
+  #if(is.null(ref)) ref=na.omit(apply(I,1,function(x) which(x!=0)[1]))
+  if(is.null(ref)) {
+    rind = which(apply(I, 1, sum)!=0)
+    ref = c(0, length(rind))
+    for(ri in 1:length(rind)){
+      (rr = rind[ri])
+      (ref[ri] = which(I[rr,]!=0)[1])
+    }
+  }
   if(!is.null(ref)){ if(length(ref)!=tn) stop("please have a correct length for reference vector")}
   wt=which(apply(I, 1, sum)!=0)   #index of transient states
   an=nrow(I)-tn                   #number of absorbing states
@@ -71,7 +77,6 @@ rrmultinom=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,ref=NULL){
       mp=mp+mc
     }
 
-    library(nnet)
     B0=matrix(0,q,K)
     SE=matrix(0,q,K)
     bp=0                           #pointer to the coefficient matrix column
@@ -83,16 +88,16 @@ rrmultinom=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,ref=NULL){
       bcl=sum(I[ti,])-1            #number of coefficient columns for ith MLR (with )
       pred0=as.matrix(mdata[mdata[,3]==ti,(5:(4+q)),drop=FALSE])
       rlev=ref[i]
-      resp01=relevel(resp0,ref=as.character(rlev))
+      resp01=stats::relevel(resp0,ref=as.character(rlev))
       data0=as.data.frame(cbind(resp01,pred0))
-      fit=multinom(resp01 ~ 0+pred0, data = data0)
+      fit=nnet::multinom(resp01 ~ 0+pred0, data = data0)
       B0[,(bp+1):(bp+bcl)] = t(summary(fit)$coefficients)
       SE[,(bp+1):(bp+bcl)] = t(summary(fit)$standard.errors)
       bp=bp+bcl
       fvalue=fvalue+summary(fit)$value
     }
     zwpart=B0/SE
-    pwpart = (1 - pnorm(abs(zwpart), 0, 1)) * 2
+    pwpart = (1 - stats::pnorm(abs(zwpart), 0, 1)) * 2
     return(list(Alpha=NULL,Gamma=NULL,Beta=B0,Dcoe=B0,Dsderr=SE,Dpval=pwpart,coemat=NULL,niter=NULL,df=NULL,loglik=fvalue))
   } else {
 
@@ -119,7 +124,6 @@ rrmultinom=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,ref=NULL){
     if(R > min(p,K)) stop("rank should not be larger than the minimal dimension of coefficient matrix")
 
     #get the initial value for iteration
-    library(nnet)
     B0=matrix(0,p,K)
     bp=0
     for (i in 1:tn){
@@ -128,9 +132,9 @@ rrmultinom=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,ref=NULL){
       bcl=sum(I[ti,])-1            #number of coefficient columns for ith MLR (with )
       pred0=as.matrix(mdata[mdata[,3]==ti,(5:(4+p)),drop=FALSE])
       rlev=ref[i]
-      resp01=relevel(resp0,ref=as.character(rlev))
+      resp01=stats::relevel(resp0,ref=as.character(rlev))
       data0=as.data.frame(cbind(resp01,pred0))
-      fit=multinom(resp01 ~ 0+pred0, data = data0)
+      fit=nnet::multinom(resp01 ~ 0+pred0, data = data0)
       B0[,(bp+1):(bp+bcl)] = t(summary(fit)$coefficients)
       bp=bp+bcl
     }
@@ -199,7 +203,7 @@ rrmultinom=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,ref=NULL){
       Dcoe=Diter
       Dsderr=Gnew$sderr[1:q,]
       zwpart=Diter/Dsderr
-      pwpart = (1 - pnorm(abs(zwpart), 0, 1)) * 2
+      pwpart = (1 - stats::pnorm(abs(zwpart), 0, 1)) * 2
     }
 
     Alpha = A.iter

@@ -26,11 +26,6 @@
 #' }
 #'
 #'
-#' @export
-#'
-#' @references
-#'
-#' @examples
 #'
 #'
 #'
@@ -139,7 +134,7 @@ sdfun=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,B,tpoint=NULL,ref){  #tpoint is 
   fsdVB=sqrt(matrix(diag(sdVB),p+q,K))
 
   zwpart=oricoe/fsdVB
-  pwpart = (1 - pnorm(abs(zwpart), 0, 1))*2
+  pwpart = (1 - stats::pnorm(abs(zwpart), 0, 1))*2
   return(list(coe=oricoe,sd=fsdVB,pvalue=pwpart))
 }
 
