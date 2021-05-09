@@ -8,7 +8,8 @@
 #' @param R the rank of reduced rank model
 #' @param p the number of covariates in the dimension reduction
 #' @param q the numbne of study covariates
-#' @param I a U by U incidence matrix with elements; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise
+#' @param I a U by U incidence matrix with elements; I(i,j)=1 if state j can be
+#'     accessed from state i in one step and 0 otherwise
 #' @param iniA initial value for the iteration
 #' @param eps the tolerance for convergence, default is 10^-5
 #' @param refA a vector of reference categories
@@ -29,7 +30,8 @@ Aupdate=function(Dfix,Gamma, Adata,R,p,q,I,iniA, eps,refA){
 
    zyo=Adata
 
-  if(missing(iniA)) iniA <- matrix(rep(0.01,p*R),p,R)#iniA <- matrix(rnorm(p*R),p,R) #give an initial value to A iniA <- matrix(runif(p*R,-0.7,0.7),p,R)
+  if(missing(iniA)) iniA <- matrix(rep(0.01,p*R),p,R)#give an initial value to A
+  #iniA <- matrix(rnorm(p*R),p,R)
   loglikeold=100; iteAu=0; deltaAu=10; Avc.old=iniA
   while(deltaAu > eps & iteAu <=100){
     iteAu=iteAu+1

@@ -7,17 +7,21 @@
 sdfun(I, z1 = NULL, z2 = NULL, T, R, eps = 1e-05, B, tpoint = NULL, ref)
 }
 \arguments{
-\item{I}{a U by U incidence matrix with elements; U is the number of states; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise}
+\item{I}{a U by U incidence matrix with elements; U is the number of states;
+I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise}
 
-\item{z1}{a n by p matrix with covariates involved in the dimension reduction(DR), n is the number of subjects, p is the number of covariates involved in DR}
+\item{z1}{a n by p matrix with covariates involved in the dimension reduction(DR),
+n is the number of subjects, p is the number of covariates involved in DR}
 
-\item{z2}{a n by q matrix with study covariates (not in dimension reduction), q is the number of study covariates}
+\item{z2}{a n by q matrix with study covariates (not in dimension reduction),
+q is the number of study covariates}
 
 \item{T}{a M by 3 state matrix,
 \itemize{
 \item the first column is a subject number between 1,..,n;
 \item the second column is time;
-\item the third column is the state occupied by subject in column 1 at time indicated in column 2
+\item the third column is the state occupied by subject in column 1 at time
+    indicated in column 2
 }}
 
 \item{R}{the rank}
@@ -26,7 +30,8 @@ sdfun(I, z1 = NULL, z2 = NULL, T, R, eps = 1e-05, B, tpoint = NULL, ref)
 
 \item{B}{the bootstrap number}
 
-\item{tpoint}{a matrix has two columns with the participants' visit information about timeline}
+\item{tpoint}{a matrix has two columns with the participants' visit information
+about timeline}
 
 \item{ref}{a vector of reference categories}
 }

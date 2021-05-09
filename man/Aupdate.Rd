@@ -19,7 +19,8 @@ Aupdate(Dfix, Gamma, Adata, R, p, q, I, iniA, eps, refA)
 
 \item{q}{the numbne of study covariates}
 
-\item{I}{a U by U incidence matrix with elements; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise}
+\item{I}{a U by U incidence matrix with elements; I(i,j)=1 if state j can be
+accessed from state i in one step and 0 otherwise}
 
 \item{iniA}{initial value for the iteration}
 

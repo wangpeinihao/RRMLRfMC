@@ -1,22 +1,25 @@
 Package: RRMLRfMC
 Type: Package
-Title: Reduced-rank multinomial logistic regression for Markov chains
-Version: 0.0.0.9000
+Title: Reduced-Rank Multinomial Logistic Regression for Markov Chains
+Version: 0.1.0
 Author: Pei Wang, Richard J. Kryscio
 Maintainer: Pei Wang <wangp33@miamioh.edu>
-Description: Fit the reduced-rank multinomial logistic regression (MLR) model for 
-    Markov chains in R. It combines the ideas of MLR in Markov chains and reduced-rank.
-    It will be very useful in a study where mult-states model is assumed and each 
-    transition among the states is controlled by a series of covariates. The key 
-    advantage is to reduce the number of parameters to be estimated. The final coefficients
-    for all the covariates and the p-values for the intested covariates will be reported.
-    The p-values for the whole coefficient matrix can be calculated by two bootstrap 
-    methods.
+Description: Fit the reduced-rank multinomial logistic regression model for Markov
+    chains in R. It combines the ideas of multinomial logistic regression in Markov 
+    chains and reduced-rank.It is very useful in a study where multi-states model 
+    is assumed and each transition among the states is controlled by a series of 
+    covariates. The key advantage is to reduce the number of parameters to be estimated.
+    The final coefficients for all the covariates and the p-values for the interested
+    covariates will be reported. The p-values for the whole coefficient matrix can
+    be calculated by two bootstrap methods.
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
 Imports: nnet
-Suggestions:
 Depends: 
     R (>= 3.5.0)
 RoxygenNote: 7.1.1
+Suggests: 
+    rmarkdown,
+    knitr
+

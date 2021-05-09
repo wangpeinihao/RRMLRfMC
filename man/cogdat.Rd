@@ -26,7 +26,8 @@ A data frame with 6240 rows and 14 columns:
 cogdat
 }
 \description{
-A dataset containing the states and covariates of 649 participants enrolled in the BRAiNS cohort at
-the University of Kentucky's Alzheimer's Disease Research Center.
+A dataset containing the states and covariates of 649 participants enrolled in
+    the BRAiNS cohort at the University of Kentucky's Alzheimer's Disease Research
+    Center.
 }
 \keyword{datasets}

@@ -7,24 +7,30 @@
 rrmultinom(I, z1 = NULL, z2 = NULL, T, R, eps = 1e-05, ref = NULL)
 }
 \arguments{
-\item{I}{a U by U incidence matrix with elements; U is number of states; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise}
+\item{I}{a U by U incidence matrix with elements; U is number of states; I(i,j)=1
+if state j can be accessed from state i in one step and 0 otherwise}
 
-\item{z1}{a n by p matrix with covariates involved in the dimension reduction(DR), n is the number of subjects, p is the number of covariates involved in DR}
+\item{z1}{a n by p matrix with covariates involved in the dimension reduction(DR),
+n is the number of subjects, p is the number of covariates involved in DR}
 
-\item{z2}{a n by q matrix with study covariates (not in dimension reduction), q is the number of study covariates}
+\item{z2}{a n by q matrix with study covariates (not in dimension reduction),
+q is the number of study covariates}
 
 \item{T}{a M by 3 state matrix,
 \itemize{
 \item the first column is a subject number between 1,..,n;
 \item the second column is time;
-\item the third column is the state occupied by subject in column 1 at time indicated in column 2
+\item the third column is the state occupied by subject in column 1 at time indicated
+    in column 2
 }}
 
 \item{R}{the rank}
 
 \item{eps}{the tolerance for convergence; the default is 10^-5}
 
-\item{ref}{a vector of reference categories; the default is NULL and if NULL is used, the function will use the first category as the reference category for each row}
+\item{ref}{a vector of reference categories; the default is NULL and if NULL
+is used, the function will use the first category as the reference category
+for each row}
 }
 \value{
 a list of outputs:
@@ -39,9 +45,11 @@ a list of outputs:
 \item niter: the iteration number to get converged
 \item df: the degrees of freedom
 \item loglik: the final loglikelihood
-\item converge: three possible values with 0 means fail to converge, 1 means converges, and 2 means the maximum iteration is achieved
+\item converge: three possible values with 0 means fail to converge, 1 means
+    converges, and 2 means the maximum iteration is achieved
 }
 }
 \description{
-This function is used to fit the reduced rank multinomial logistic regression for markov chain
+This function is used to fit the reduced rank multinomial logistic regression
+    for markov chain
 }

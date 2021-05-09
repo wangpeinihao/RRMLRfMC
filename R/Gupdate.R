@@ -6,7 +6,8 @@
 #' @param Gdata the dataset used to update G
 #' @param p the number of covariates in the dimension reduction
 #' @param q the numbne of study covariates
-#' @param I a U by U incidence matrix with elements; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise
+#' @param I a U by U incidence matrix with elements; I(i,j)=1 if state j can be
+#'     accessed from state i in one step and 0 otherwise
 #' @param refG a vector of reference categories
 #'
 #' @return a list of outputs:

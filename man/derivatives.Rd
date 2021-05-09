@@ -13,7 +13,8 @@ derivatives(A, Gamma, Dmat, I, zy, refA)
 
 \item{Dmat}{the coefficient matrix for the fixed variables,}
 
-\item{I}{a U by U incidence matrix with elements; I(i,j)=1 if state j can be accessed from state i in one step and 0 otherwise}
+\item{I}{a U by U incidence matrix with elements; I(i,j)=1 if state j can be
+accessed from state i in one step and 0 otherwise}
 
 \item{zy}{the variable values for a given observation}
 
@@ -28,5 +29,6 @@ a list of outputs:
 }
 }
 \description{
-This function is used calculate the derivative values (first and second derivatives for Newton-Raphson method) and loglikelihood when updating A
+This function is used calculate the derivative values (first and second derivatives
+    for Newton-Raphson method) and loglikelihood when updating A
 }
