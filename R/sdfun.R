@@ -30,10 +30,38 @@
 #' \item pvalue: the p-value matrix
 #' }
 #'
+#'@export
 #'
-#'
-#'
-#'
+#'@examples
+#'\donttest{
+#'# generate the Markov chain
+#' U=7
+#' I1=I2=I3=rep(1,7)
+#' I4=c(0,0,0,1,1,1,1)
+#' I5=I6=I7=rep(0,7)
+#' I=rbind(I1,I2,I3,I4,I5,I6,I7)
+#'# prepare the data
+#' data=cogdat
+#' n=length(unique(data[,1]))
+#' M=nrow(data)+n
+#' Mc=0
+#' z=matrix(0,n,9)
+#' colnames(z)=colnames(data)[5:13]
+#' T=matrix(0,M,3)
+#' for(i in 1:n){
+#'   subdat=data[which(data[,1]==i),,drop=FALSE]
+#'   z[i,]=subdat[1,5:13]
+#'   mc=nrow(subdat)
+#'   T[(Mc+1):(Mc+mc+1),1]=i
+#'   T[(Mc+1):(Mc+mc+1),2]=0:mc
+#'   T[(Mc+1):(Mc+mc+1),3]=c(subdat[1,3],subdat[,4])
+#'  Mc=Mc+mc+1
+#' }
+#' z1=z[,c(1:3),drop=FALSE]
+#' z2=z[,4,drop=FALSE]
+#'# find the standard deviation matrix for the model with rank 1
+#' sdfun(I,z1,z2,T,1,eps = 1e-5,2,ref=c(1,1,1,4))
+#'}
 #'
 #'
 
@@ -127,7 +155,7 @@ sdfun=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,B,tpoint=NULL,ref){
     tryCatch({
     rrmodel=rrmultinom(I,z1=z1new,z2=z2new,T=Tnew,R,eps=1e-5,ref)
     niter=rrmodel$niter
-    }, error=function(e){niter<<-300})
+    }, error=function(e){return(niter=300)})
 
     if(niter < 200){ # only record the results when niter < 200
       bootcoe[Bi,]=as.vector(rrmodel$coemat)

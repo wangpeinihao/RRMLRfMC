@@ -38,16 +38,46 @@
 #'     converges, and 2 means the maximum iteration is achieved
 #' }
 #'
+#'@export
 #'
-#'
-#'
-#'
+#'@examples
+#'\donttest{
+#'# generate the Markov chain
+#'U=7
+#'I1=I2=I3=rep(1,7)
+#'I4=c(0,0,0,1,1,1,1)
+#'I5=I6=I7=rep(0,7)
+#'I=rbind(I1,I2,I3,I4,I5,I6,I7)
+#'# prepare the data
+#'data=cogdat
+#'n=length(unique(data[,1]))
+#'M=nrow(data)+n
+#'Mc=0
+#'z=matrix(0,n,9)
+#'colnames(z)=colnames(data)[5:13]
+#'T=matrix(0,M,3)
+#'for(i in 1:n){
+#'  subdat=data[which(data[,1]==i),,drop=FALSE]
+#'  z[i,]=subdat[1,5:13]
+#'  mc=nrow(subdat)
+#'  T[(Mc+1):(Mc+mc+1),1]=i
+#'  T[(Mc+1):(Mc+mc+1),2]=0:mc
+#'  T[(Mc+1):(Mc+mc+1),3]=c(subdat[1,3],subdat[,4])
+#'  Mc=Mc+mc+1
+#'}
+#'z1=z[,c(1:3),drop=FALSE]
+#'z2=z[,4,drop=FALSE]
+#'# fit the model with rank 1
+#'rrmultinom(I,z1,z2,T,1,ref=c(1,1,1,4))
+#'}
 #'
 
 rrmultinom=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,ref=NULL){
   #U=number of states; I=incidence matrix;z1=DR variables;
   #z2=study variables;T=state matrix;
 
+  z1=as.matrix(z1)
+  z2=as.matrix(z2)
   I=as.matrix(I)
   U=nrow(I)
   tn=sum(apply(I, 1, sum)!=0)     #number of transient states
@@ -172,7 +202,7 @@ rrmultinom=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,ref=NULL){
         # } else {norm.Ai <- sqrt(sum(Ai^2))}
         # norm.Ai.mat <- matrix(norm.Ai,p,R,byrow=TRUE)
         # A.iter <- Ai/norm.Ai.mat
-      }, error=function(e){convergent<<-0; iter<<-1000})
+      }, error=function(e){return(list(convergent=0, iter=1000))})
 
       Gnew=Gupdate(A=A.iter,Gdata=mdata[,-c(1,2)],p,q,I,refG=ref)#pri=pri,curr=curr,pred=pred,fpred=fpred
       if(q==0){

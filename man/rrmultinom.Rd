@@ -53,3 +53,35 @@ a list of outputs:
 This function is used to fit the reduced rank multinomial logistic regression
     for markov chain
 }
+\examples{
+\donttest{
+# generate the Markov chain
+U=7
+I1=I2=I3=rep(1,7)
+I4=c(0,0,0,1,1,1,1)
+I5=I6=I7=rep(0,7)
+I=rbind(I1,I2,I3,I4,I5,I6,I7)
+# prepare the data
+data=cogdat
+n=length(unique(data[,1]))
+M=nrow(data)+n
+Mc=0
+z=matrix(0,n,9)
+colnames(z)=colnames(data)[5:13]
+T=matrix(0,M,3)
+for(i in 1:n){
+ subdat=data[which(data[,1]==i),,drop=FALSE]
+ z[i,]=subdat[1,5:13]
+ mc=nrow(subdat)
+ T[(Mc+1):(Mc+mc+1),1]=i
+ T[(Mc+1):(Mc+mc+1),2]=0:mc
+ T[(Mc+1):(Mc+mc+1),3]=c(subdat[1,3],subdat[,4])
+ Mc=Mc+mc+1
+}
+z1=z[,c(1:3),drop=FALSE]
+z2=z[,4,drop=FALSE]
+# fit the model with rank 1
+rrmultinom(I,z1,z2,T,1,ref=c(1,1,1,4))
+}
+
+}
