@@ -54,7 +54,6 @@ This function is used to fit the reduced rank multinomial logistic regression
     for markov chain
 }
 \examples{
-\donttest{
 # generate the Markov chain
 U=7
 I1=I2=I3=rep(1,7)
@@ -78,10 +77,9 @@ for(i in 1:n){
  T[(Mc+1):(Mc+mc+1),3]=c(subdat[1,3],subdat[,4])
  Mc=Mc+mc+1
 }
-z1=z[,c(1:3),drop=FALSE]
+#z1=z[,c(1:3),drop=FALSE]
 z2=z[,4,drop=FALSE]
 # fit the model with rank 1
-rrmultinom(I,z1,z2,T,1,ref=c(1,1,1,4))
-}
+rrmultinom(I,z1=NULL,z2,T,1,eps=9,ref=c(1,1,1,4))
 
 }

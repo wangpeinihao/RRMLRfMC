@@ -33,7 +33,6 @@
 #'@export
 #'
 #'@examples
-#'\donttest{
 #'# generate the Markov chain
 #' U=7
 #' I1=I2=I3=rep(1,7)
@@ -57,13 +56,15 @@
 #'   T[(Mc+1):(Mc+mc+1),3]=c(subdat[1,3],subdat[,4])
 #'  Mc=Mc+mc+1
 #' }
-#' z1=z[,c(1:3),drop=FALSE]
+#' #z1=z[,c(1:3),drop=FALSE]
 #' z2=z[,4,drop=FALSE]
 #'# find the standard deviation matrix for the model with rank 1
-#' sdfun(I,z1,z2,T,1,eps = 1e-5,2,ref=c(1,1,1,4))
-#'}
+#' sdfun(I,z1=NULL,z2,T,1,eps = 9,2,ref=c(1,1,1,4))
 #'
 #'
+#'
+#'
+
 
 sdfun=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,B,tpoint=NULL,ref){
 #tpoint is a M-n by 2 matrix with the patient id and visit time points(length 4)
@@ -153,7 +154,7 @@ sdfun=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,B,tpoint=NULL,ref){
     }
 
     tryCatch({
-    rrmodel=rrmultinom(I,z1=z1new,z2=z2new,T=Tnew,R,eps=1e-5,ref)
+    rrmodel=rrmultinom(I,z1=z1new,z2=z2new,T=Tnew,R,eps=eps,ref)
     niter=rrmodel$niter
     }, error=function(e){return(niter=300)})
 
@@ -163,7 +164,7 @@ sdfun=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,B,tpoint=NULL,ref){
     }
   }
 
-  oricoe=rrmultinom(I,z1,z2,T,R,eps=1e-5,ref)$coemat
+  oricoe=rrmultinom(I,z1,z2,T,R,eps=eps,ref)$coemat
   cVB=apply(bootcoe,2,mean)
   cVB=t(replicate(B, cVB))
   sdVB=1/(B-1)*t(bootcoe-cVB)%*%(bootcoe-cVB)

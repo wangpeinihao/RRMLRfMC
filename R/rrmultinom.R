@@ -41,7 +41,6 @@
 #'@export
 #'
 #'@examples
-#'\donttest{
 #'# generate the Markov chain
 #'U=7
 #'I1=I2=I3=rep(1,7)
@@ -65,19 +64,16 @@
 #'  T[(Mc+1):(Mc+mc+1),3]=c(subdat[1,3],subdat[,4])
 #'  Mc=Mc+mc+1
 #'}
-#'z1=z[,c(1:3),drop=FALSE]
+#'#z1=z[,c(1:3),drop=FALSE]
 #'z2=z[,4,drop=FALSE]
 #'# fit the model with rank 1
-#'rrmultinom(I,z1,z2,T,1,ref=c(1,1,1,4))
-#'}
+#'rrmultinom(I,z1=NULL,z2,T,1,eps=9,ref=c(1,1,1,4))
 #'
 
 rrmultinom=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,ref=NULL){
   #U=number of states; I=incidence matrix;z1=DR variables;
   #z2=study variables;T=state matrix;
 
-  z1=as.matrix(z1)
-  z2=as.matrix(z2)
   I=as.matrix(I)
   U=nrow(I)
   tn=sum(apply(I, 1, sum)!=0)     #number of transient states
@@ -95,9 +91,10 @@ rrmultinom=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,ref=NULL){
   an=nrow(I)-tn                   #number of absorbing states
   K=sum(I)-tn                     #columns of the coefficient matrix
 
-  if(is.null(z1) & is.null(z2)) stop("please input the covariates")
+  if(is.null(z1) &is.null(z2)) stop("please input the covariates")
 
   if(is.null(z1)){
+    z2=as.matrix(z2)
     n=nrow(z2)  #number of subjects
     q=ncol(z2)  #number of study covariates
     M=nrow(T)
@@ -134,30 +131,51 @@ rrmultinom=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,ref=NULL){
       bp=bp+bcl
       fvalue=fvalue+summary(fit)$value
     }
+    
     zwpart=B0/SE
     pwpart = (1 - stats::pnorm(abs(zwpart), 0, 1)) * 2
-    return(list(Alpha=NULL,Gamma=NULL,Beta=B0,Dcoe=B0,Dsderr=SE,Dpval=pwpart,coemat=NULL,niter=NULL,df=NULL,loglik=fvalue))
+    return(list(Alpha=NULL,Gamma=NULL,Beta=B0,Dcoe=B0,Dsderr=SE,Dpval=pwpart,coemat=B0,niter=1,df=NULL,loglik=fvalue))
   } else {
 
-    n=nrow(z2)    #number of subjects
+    z1=as.matrix(z1)
+    if(is.null(z2)){
+      q=0
+      }else{
+        z2=as.matrix(z2)
+        q=ncol(z2)    #number of study covariates
+      }
+    n=nrow(z1)    #number of subjects
     p=ncol(z1)    #number of covariate in DR
-    q=ncol(z2)    #number of study covariates
     M=nrow(T)
     TN=M-n        #number of total transitions
 
     mdata=matrix(0,TN,4+q+p)  #create a matrix with columns: transition, observation,prior,current,study covariates
     mp=0        #pointer for create mdata
-    for(i in 1:n){
-      subdat=T[T[,1]==i,]
-      mc=nrow(subdat)-1
-      mdata[(mp+1):(mp+mc),1]=(mp+1):(mp+mc)
-      mdata[(mp+1):(mp+mc),2]=i
-      mdata[(mp+1):(mp+mc),3]=subdat[,3][1:mc]
-      mdata[(mp+1):(mp+mc),4]=subdat[,3][2:(mc+1)]
-      mdata[(mp+1):(mp+mc),(5:(4+p))]=t(replicate(mc,z1[i,]))
-      mdata[(mp+1):(mp+mc),((4+p+1):(4+p+q))]=t(replicate(mc,z2[i,]))
-      mp=mp+mc
+    if(q==0){
+      for(i in 1:n){
+        subdat=T[T[,1]==i,]
+        mc=nrow(subdat)-1
+        mdata[(mp+1):(mp+mc),1]=(mp+1):(mp+mc)
+        mdata[(mp+1):(mp+mc),2]=i
+        mdata[(mp+1):(mp+mc),3]=subdat[,3][1:mc]
+        mdata[(mp+1):(mp+mc),4]=subdat[,3][2:(mc+1)]
+        mdata[(mp+1):(mp+mc),(5:(4+p))]=t(replicate(mc,z1[i,]))
+        mp=mp+mc
+      }
+    }else{
+      for(i in 1:n){
+        subdat=T[T[,1]==i,]
+        mc=nrow(subdat)-1
+        mdata[(mp+1):(mp+mc),1]=(mp+1):(mp+mc)
+        mdata[(mp+1):(mp+mc),2]=i
+        mdata[(mp+1):(mp+mc),3]=subdat[,3][1:mc]
+        mdata[(mp+1):(mp+mc),4]=subdat[,3][2:(mc+1)]
+        mdata[(mp+1):(mp+mc),(5:(4+p))]=t(replicate(mc,z1[i,]))
+        mdata[(mp+1):(mp+mc),((4+p+1):(4+p+q))]=t(replicate(mc,z2[i,]))
+        mp=mp+mc
+      }
     }
+    
 
     if(R > min(p,K)) stop("rank should not be larger than the minimal dimension of coefficient matrix")
 
@@ -189,7 +207,7 @@ rrmultinom=function(I,z1=NULL,z2=NULL,T,R,eps = 1e-5,ref=NULL){
     Diter=matrix(0,q,K)
 
     #newton raphson algorithm
-    iter=0;prev.loglik=0;Delta=10;miter=200
+    iter=0;prev.loglik=0;Delta=100;miter=200
     while(abs(Delta) > eps & iter <=miter) {
       tryCatch({
         Anew = Aupdate(Dfix=Diter,Gamma=Gamma.iter, Adata=mdata[,-c(1,2)], R=R,p=p,q=q,I=I, eps=eps,refA=ref)#iniA=iniA,pri=pri,curr=curr,pred=pred, fpred=fpred,

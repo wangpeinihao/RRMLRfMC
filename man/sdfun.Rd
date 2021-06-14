@@ -48,7 +48,6 @@ This function is used get the standard error matrix from bootstrap method
 It returns the matrices of standard error and p-value for the coefficient matrix
 }
 \examples{
-\donttest{
 # generate the Markov chain
 U=7
 I1=I2=I3=rep(1,7)
@@ -72,11 +71,12 @@ for(i in 1:n){
   T[(Mc+1):(Mc+mc+1),3]=c(subdat[1,3],subdat[,4])
  Mc=Mc+mc+1
 }
-z1=z[,c(1:3),drop=FALSE]
+#z1=z[,c(1:3),drop=FALSE]
 z2=z[,4,drop=FALSE]
 # find the standard deviation matrix for the model with rank 1
-sdfun(I,z1,z2,T,1,eps = 1e-5,2,ref=c(1,1,1,4))
-}
+sdfun(I,z1=NULL,z2,T,1,eps = 9,2,ref=c(1,1,1,4))
+
+
 
 
 }

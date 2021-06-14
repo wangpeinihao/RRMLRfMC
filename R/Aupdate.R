@@ -32,7 +32,7 @@ Aupdate=function(Dfix,Gamma, Adata,R,p,q,I,iniA, eps,refA){
 
   if(missing(iniA)) iniA <- matrix(rep(0.01,p*R),p,R)#give an initial value to A
   #iniA <- matrix(rnorm(p*R),p,R)
-  loglikeold=100; iteAu=0; deltaAu=10; Avc.old=iniA
+  loglikeold=100; iteAu=0; deltaAu=100; Avc.old=iniA
   while(deltaAu > eps & iteAu <=100){
     iteAu=iteAu+1
     Dmat=Dfix
